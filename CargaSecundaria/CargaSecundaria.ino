@@ -11,14 +11,14 @@ TinyGPSPlus gps;
 //The serial connection to the GPS device
 SoftwareSerial gss(RXPin, TXPin);
 
-double lat = 2;
-double lng = 3;
+double lat;
+double lng;
 
 byte CargaSecundaria = 0xCC;
 byte CargaPrimaria = 0xFF;
 byte EstacionTerrena = 0xBB;
 String myMessage = "";
-String updateMessage = "";
+String updateMessage = "listo";
 int counter = 1;
 int c = 0;
 
@@ -67,7 +67,7 @@ void loop() {
     Serial.println("Sending packet: ");
     // send packet
     myMessage = String(lat, 6) + "," + String(lng, 6);
-    
+    Serial.println(myMessage);
     
     LoRa.beginPacket();
     LoRa.write(CargaPrimaria);

@@ -23,17 +23,23 @@ Servo servo;
 float aceleracionX, aceleracionY, aceleracionZ;
 float giroscopioX, giroscopioY, giroscopioZ;
 float direccionMagnetometro, magnetometroX, magnetometroY, magnetometroZ;
-float presionInicial, altura, temperatura, presicion;
+float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
 double distanciaEntreCargas;
 
-long ultimaVezQueSeEnvioUnMensaje = 0;  // last send time
+long ultimaVezQueSeEnvioUnMensaje = 0;
+long tiempoEncendido = 0;
 int intervalo = 300;
 
+// se debe de cambiar!!!
 int alturaMaxima = 2;
-bool maximoAlcanzado = false;
+int alturaDespliegue = 1;
 
+bool maximoAlcanzado = false;
+bool mensajeEnviadoALaCargaSecundaria = false;
+
+String mensaje = "";
 
 void setup() {
   Serial.begin(115200);
@@ -45,38 +51,39 @@ void setup() {
   Serial.println("Carga Primaria");
 
   if (!LoRa.begin(433E6)) {
-    Serial.println("Starting LoRa failed!");
+    Serial.println("Fallo en iniciar LoRa!");
     while (1);
   }
 
-  
-
+  ss.begin(GPSBaud);
   bmp.begin(0x76);
   mpu.beginAccel();
   mpu.beginGyro();
   mpu.beginMag();
-  //You can set your own offset for mag values
+
   mpu.magXOffset = -50;
   mpu.magYOffset = -55;
   mpu.magZOffset = -10;
+
   presionInicial = bmp.readPressure() / 100;
-  ss.begin(GPSBaud);
 }
 
 void loop() {
-  if (millis() - ultimaVezQueSeEnvioUnMensaje > intervalo) {
+  mensaje = "";
+  tiempoEncendido = millis();
+
+  if (tiempoEncendido - ultimaVezQueSeEnvioUnMensaje > intervalo) {
     while (ss.available() > 0)
       if (gps.encode(ss.read())) {
         latitudCargaPrimaria = gps.location.lat();
         longitudCargaPrimaria = gps.location.lng();        
         distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
       }
-      distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
+
     if (mpu.accelUpdate() == 0) {
        aceleracionX = mpu.accelX();
        aceleracionY = mpu.accelY();
        aceleracionZ = mpu.accelZ();
-       aSqrt = mpu.accelSqrt();
      }
      if (mpu.gyroUpdate() == 0) {
        giroscopioX = mpu.gyroX();
@@ -91,38 +98,53 @@ void loop() {
      }
   
     temperatura = (bmp.readTemperature()) - 2.45;
-    presicion = (bmp.readPressure() / 100);
-    altura = (bmp.readAltitude(presionInicial));  // this should be adjusted to your local forcase
-
+    presion = (bmp.readPressure() / 100);
+    altura = (bmp.readAltitude(presionInicial));
 
     if(altura >= alturaMaxima){
       maximoAlcanzado = true;
     }
 
-    if(altura <= 1 && maximoAlcanzado){
+    if(altura <= alturaDespliegue && maximoAlcanzado){
       //se activa el servo...
       servo.write(90);
     }
     
 
-    if(mensajeContingencia == "3312"){
+    if(mensajeContingencia == "c"){
       servo.write(90);//se activa el servo
     }
 
-    
+    int contador = 0;
+    if(altura <= 20 && maximoAlcanzado && !mensajeEnviadoALaCargaSecundaria){
+      while(contador <= 25){
+        enviarMensajeACargaSecundaria("listo");
+        contador++;
+        delay(20);
+      }
+    }
 
-    // int count = 0;
-    // if(altu >= 1 && altu <= 2 && maximoAlcanzado){
-    //   while(count <= 25){
-    //     sendMessageCS("listo");
-    //     count++;
-    //     delay(20);
-    //   }
-    // }
+    mensaje += "t" + String(temperatura) + ",";
+    mensaje += "p" + String(presion) + ",";
+    mensaje += "a" + String(altura) + ",";
+    mensaje += "t" + String(temperatura) + ",";
+    mensaje += "t" + String(temperatura) + ",";
+    mensaje += "AX" + String(aceleracionX) + ",";
+    mensaje += "AY" + String(aceleracionY) + ",";
+    mensaje += "AZ" + String(aceleracionZ) + ",";
+    mensaje += "GX" + String(giroscopioX) + ",";
+    mensaje += "GY" + String(giroscopioY) + ",";
+    mensaje += "GZ" + String(giroscopioZ) + ",";
+    mensaje += "DM" + String(direccionMagnetometro)+ ",";
+    mensaje += "lat1" + String(latitudCargaPrimaria, 6) + ",";
+    mensaje += "lng1" + String(longitudCargaPrimaria, 6) + ",";
+    mensaje += "LAT2" + String(latitudCargaSecundaria, 6) + ",";
+    mensaje += "LNG2" + String(longitudCargaSecundaria, 6) + ",";
+    mensaje += "DI" + String(distanciaEntreCargas) + ",";
+    mensaje += "TM" + String(tiempoEncendido);
 
-    //Serial.println(distance);
-    sendMessage("t" + String(temperatura) + "," + "p" + String(presicion) + "," + "a" + String(altura) + ","  + "AX" + String(aceleracionX) + "," + "AY" + String(aceleracionY) + "," + "AZ" + String(aceleracionZ) + "," + "GX" + String(giroscopioX) + "," + "GY" + String(giroscopioY) + "," + "GZ" + String(giroscopioZ) + "," + "DM" + String(direccionMagnetometro)+ "," + "lat1" + String(latitudCargaPrimaria, 6) + "," + "lng1" + String(longitudCargaPrimaria, 6) + "," + "LAT2" + String(latitudCargaSecundaria, 6) + "," + "LNG2" + String(longitudCargaSecundaria, 6) + "," + "DI" + String(distanciaEntreCargas) + "," + "TM" + String(millis()));
-    //Serial.println("lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2) + "," + "LNG2" + String(lng2) + "," + "DI" + String(distance));
+    sendMessage(mensaje);
+
 
     ultimaVezQueSeEnvioUnMensaje = millis(); 
     intervalo = random(145) + 100;  
@@ -143,7 +165,7 @@ void sendMessage(String message) {
   Serial.println(message);
 }
 
-void sendMessageCS(String message) {
+void enviarMensajeACargaSecundaria(String message) {
   LoRa.beginPacket();
   LoRa.write(CargaSecundaria);
   LoRa.write(CargaPrimaria);
@@ -151,6 +173,7 @@ void sendMessageCS(String message) {
   LoRa.print(message);
   LoRa.endPacket();
   Serial.println("Sending packet a carga secundaria");
+  mensajeEnviadoALaCargaSecundaria = true;
 }
 
 void onReceive(int packetSize) {
