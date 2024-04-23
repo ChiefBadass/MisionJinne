@@ -9,27 +9,27 @@
 byte CargaPrimaria = 0xFF;
 byte CargaSecundaria = 0xCC;
 byte EstacionTerrena = 0xBB;
-String message = "";
-String updateMessage = "";
+String mensajeContingencia = "";
 
+static const int RxPinGPS = 3, TxPinGPS = 4;
+static const uint32_t GPSBaud = 9600;
 
+TinyGPSPlus gps;
+SoftwareSerial ss(RxPinGPS, TxPinGPS);
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
 Servo servo;
 
-static const int RXPin = 3, TXPin = 4;
-static const uint32_t GPSBaud = 9600;
+float aceleracionX, aceleracionY, aceleracionZ;
+float giroscopioX, giroscopioY, giroscopioZ;
+float direccionMagnetometro, magnetometroX, magnetometroY, magnetometroZ;
+float presionInicial, altura, temperatura, presicion;
+double latitudCargaPrimaria, longitudCargaPrimaria;
+double latitudCargaSecundaria, longitudCargaSecundaria;
+double distanciaEntreCargas;
 
-TinyGPSPlus gps;
-SoftwareSerial ss(RXPin, TXPin);
-
-float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
-float presion_inicial, altu, temp, pres;
-double lat1 = 27.967036, lng1 = 110.918653, lat2 = 27.967398, lng2 = 110.918699;
-double distance;
-
-long lastSendTime = 0;  // last send time
-int interval = 300;
+long ultimaVezQueSeEnvioUnMensaje = 0;  // last send time
+int intervalo = 300;
 
 int alturaMaxima = 2;
 bool maximoAlcanzado = false;
@@ -59,53 +59,53 @@ void setup() {
   mpu.magXOffset = -50;
   mpu.magYOffset = -55;
   mpu.magZOffset = -10;
-  presion_inicial = bmp.readPressure() / 100;
+  presionInicial = bmp.readPressure() / 100;
   ss.begin(GPSBaud);
 }
 
 void loop() {
-  if (millis() - lastSendTime > interval) {
+  if (millis() - ultimaVezQueSeEnvioUnMensaje > intervalo) {
     while (ss.available() > 0)
       if (gps.encode(ss.read())) {
-        lat1 = gps.location.lat();
-        lng1 = gps.location.lng();        
-        distance = haversine(lat1, lng1, lat2, lng2);
+        latitudCargaPrimaria = gps.location.lat();
+        longitudCargaPrimaria = gps.location.lng();        
+        distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
       }
-      distance = haversine(lat1, lng1, lat2, lng2);
+      distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
     if (mpu.accelUpdate() == 0) {
-       aX = mpu.accelX();
-       aY = mpu.accelY();
-       aZ = mpu.accelZ();
+       aceleracionX = mpu.accelX();
+       aceleracionY = mpu.accelY();
+       aceleracionZ = mpu.accelZ();
        aSqrt = mpu.accelSqrt();
      }
      if (mpu.gyroUpdate() == 0) {
-       gX = mpu.gyroX();
-       gY = mpu.gyroY();
-       gZ = mpu.gyroZ();
+       giroscopioX = mpu.gyroX();
+       giroscopioY = mpu.gyroY();
+       giroscopioZ = mpu.gyroZ();
      }
       if (mpu.magUpdate() == 0) {
-       mX = mpu.magX();
-       mY = mpu.magY();
-       mZ = mpu.magZ();
-       mDirection = mpu.magHorizDirection();
+       magnetometroX = mpu.magX();
+       magnetometroY = mpu.magY();
+       magnetometroZ = mpu.magZ();
+       direccionMagnetometro = mpu.magHorizDirection();
      }
   
-    temp = (bmp.readTemperature()) - 2.45;
-    pres = (bmp.readPressure() / 100);
-    altu = (bmp.readAltitude(presion_inicial));  // this should be adjusted to your local forcase
+    temperatura = (bmp.readTemperature()) - 2.45;
+    presicion = (bmp.readPressure() / 100);
+    altura = (bmp.readAltitude(presionInicial));  // this should be adjusted to your local forcase
 
 
-    if(altu >= alturaMaxima){
+    if(altura >= alturaMaxima){
       maximoAlcanzado = true;
     }
 
-    if(altu <= 1 && maximoAlcanzado){
+    if(altura <= 1 && maximoAlcanzado){
       //se activa el servo...
       servo.write(90);
     }
     
 
-    if(updateMessage == "3312"){
+    if(mensajeContingencia == "3312"){
       servo.write(90);//se activa el servo
     }
 
@@ -121,11 +121,11 @@ void loop() {
     // }
 
     //Serial.println(distance);
-    sendMessage("t" + String(temp) + "," + "p" + String(pres) + "," + "a" + String(altu) + ","  + "AX" + String(aX) + "," + "AY" + String(aY) + "," + "AZ" + String(aZ) + "," + "GX" + String(gX) + "," + "GY" + String(gY) + "," + "GZ" + String(gZ) + "," + "DM" + String(mDirection)+ "," + "lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2, 6) + "," + "LNG2" + String(lng2, 6) + "," + "DI" + String(distance) + "," + "TM" + String(millis()));
+    sendMessage("t" + String(temperatura) + "," + "p" + String(presicion) + "," + "a" + String(altura) + ","  + "AX" + String(aceleracionX) + "," + "AY" + String(aceleracionY) + "," + "AZ" + String(aceleracionZ) + "," + "GX" + String(giroscopioX) + "," + "GY" + String(giroscopioY) + "," + "GZ" + String(giroscopioZ) + "," + "DM" + String(direccionMagnetometro)+ "," + "lat1" + String(latitudCargaPrimaria, 6) + "," + "lng1" + String(longitudCargaPrimaria, 6) + "," + "LAT2" + String(latitudCargaSecundaria, 6) + "," + "LNG2" + String(longitudCargaSecundaria, 6) + "," + "DI" + String(distanciaEntreCargas) + "," + "TM" + String(millis()));
     //Serial.println("lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2) + "," + "LNG2" + String(lng2) + "," + "DI" + String(distance));
 
-    lastSendTime = millis(); 
-    interval = random(145) + 100;  
+    ultimaVezQueSeEnvioUnMensaje = millis(); 
+    intervalo = random(145) + 100;  
   }
 
   onReceive(LoRa.parsePacket());
@@ -169,7 +169,7 @@ void onReceive(int packetSize) {
   if (myMessageLength != myMessage.length()) return;         
   
   if(sender == EstacionTerrena){
-    updateMessage = myMessage;
+    mensajeContingencia = myMessage;
     return;
   }
 
@@ -179,8 +179,8 @@ void onReceive(int packetSize) {
   char *lat = strtok(textoChar, ","); 
   char *lng = strtok(NULL, ","); 
 
-  lat2 = strtod(lat, NULL); 
-  lng2 = strtod(lng, NULL);
+  latitudCargaSecundaria = strtod(lat, NULL); 
+  longitudCargaSecundaria = strtod(lng, NULL);
 
   
 }
