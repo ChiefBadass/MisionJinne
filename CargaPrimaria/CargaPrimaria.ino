@@ -4,7 +4,7 @@
 #include <MPU9250_asukiaaa.h>
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
-#include <Servo.h>
+#include <ServoTimer2.h>
 
 byte CargaPrimaria = 0xFF;
 byte CargaSecundaria = 0xCC;
@@ -18,7 +18,7 @@ TinyGPSPlus gps;
 SoftwareSerial ss(RxPinGPS, TxPinGPS);
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
-Servo servo;
+ServoTimer2 servo;
 
 float aceleracionX, aceleracionY, aceleracionZ;
 float giroscopioX, giroscopioY, giroscopioZ;
