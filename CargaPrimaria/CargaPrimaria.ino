@@ -20,6 +20,8 @@ Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
 ServoTimer2 servo;
 
+// prueba git
+
 float aceleracionX, aceleracionY, aceleracionZ;
 float giroscopioX, giroscopioY, giroscopioZ;
 float direccionMagnetometro, magnetometroX, magnetometroY, magnetometroZ;
