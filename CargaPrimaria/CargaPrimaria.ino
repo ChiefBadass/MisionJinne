@@ -127,8 +127,6 @@ void loop() {
     mensaje += "t" + String(temperatura) + ",";
     mensaje += "p" + String(presion) + ",";
     mensaje += "a" + String(altura) + ",";
-    mensaje += "t" + String(temperatura) + ",";
-    mensaje += "t" + String(temperatura) + ",";
     mensaje += "AX" + String(aceleracionX) + ",";
     mensaje += "AY" + String(aceleracionY) + ",";
     mensaje += "AZ" + String(aceleracionZ) + ",";
