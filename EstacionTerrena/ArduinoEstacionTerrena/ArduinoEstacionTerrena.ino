@@ -3,6 +3,7 @@
 
 byte EstacionTerrena = 0xBB;
 byte CargaPrimaria = 0xFF;
+byte CargaSecundaria = 0xCC;
 String inString = "";   //hold incoming characters
 String myMessage = "";  // hold compleye message
 
@@ -61,10 +62,9 @@ if (packetSize == 0) return;
   
 
   int recipient = LoRa.read();
-  byte sender = LoRa.read();
-  byte messageLenth = LoRa.read();
+  
   String myMessage = "";
-  if (recipient != EstacionTerrena ) {
+  if (recipient !=  EstacionTerrena) {
     Serial.println("This message is not for me.");
     return;                            
   }
@@ -73,10 +73,6 @@ if (packetSize == 0) return;
     myMessage += (char)LoRa.read();
   }
  
-  if (messageLenth != myMessage.length()) {   // check length for error
-    Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
-  }
     
   Serial.println(myMessage);
   

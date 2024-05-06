@@ -41,19 +41,19 @@ styleE = "background-color:rgb(255, 0, 0);color:rgb(255,255,255);font-size:14px;
 
 # Declare graphs
 # Button 1
-proxy = QtWidgets.QGraphicsProxyWidget()
-save_button = QtWidgets.QPushButton('Iniciar almacenamiento')
-save_button.setStyleSheet(style)
-save_button.clicked.connect(data_base.start)
-proxy.setWidget(save_button)
+# proxy = QtWidgets.QGraphicsProxyWidget()
+# save_button = QtWidgets.QPushButton('Iniciar almacenamiento')
+# save_button.setStyleSheet(style)
+# save_button.clicked.connect(data_base.start)
+# proxy.setWidget(save_button)
 
 
 # Button 2
-proxy2 = QtWidgets.QGraphicsProxyWidget()
-end_save_button = QtWidgets.QPushButton('Deneter almacenamiento')
-end_save_button.setStyleSheet(style)
-end_save_button.clicked.connect(data_base.stop)
-proxy2.setWidget(end_save_button)
+# proxy2 = QtWidgets.QGraphicsProxyWidget()
+# end_save_button = QtWidgets.QPushButton('Deneter almacenamiento')
+# end_save_button.setStyleSheet(style)
+# end_save_button.clicked.connect(data_base.stop)
+# proxy2.setWidget(end_save_button)
 # Button Emergency
 proxy3 = QtWidgets.QGraphicsProxyWidget()
 emergency_buttom = QtWidgets.QPushButton('Despliegue de Emergencia')
@@ -83,12 +83,12 @@ time = graph_time(font=font)
 free_fall = graph_free_fall(font=font)
 
 
-lb = Layout.addLayout(colspan=21)
-lb.addItem(proxy)
-lb.nextCol()
-lb.addItem(proxy2)
+# lb = Layout.addLayout(colspan=21)
+# lb.addItem(proxy)
+# lb.nextCol()
+# lb.addItem(proxy2)
 
-Layout.nextRow()
+# Layout.nextRow()
 
 l1 = Layout.addLayout(colspan=10, rowspan=2)
 l11 = l1.addLayout(rowspan=1, border=(83, 83, 83))
@@ -137,7 +137,7 @@ def update():
         time.update(value_chain[15])
         distance.update(value_chain[10], value_chain[11], value_chain[12], value_chain[13], value_chain[14])
         archivo = open('C:/Users/carlo/Documents/python/Mision_Jinne-main/flight_data.csv', 'a')
-        archivo.write(f"{value_chain}/n")
+        archivo.write(f"{value_chain}\n")
         archivo.close()
         
         #acceleration.update(value_chain[3], value_chain[4], value_chain[5])

@@ -61,7 +61,7 @@ class Communication:
             if self.ser.in_waiting > 0:
                 datos_obtenidos = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                 datos = datos_obtenidos.split(',')
-                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud1, longitud1, latitud2, longitud2, distancia, tiempo = [None] * 16
+                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, latitud1, longitud1, latitud2, longitud2, distancia, tiempo = [None] * 16
 
                 for dato in datos:
                     if dato.startswith('t'):
@@ -70,34 +70,32 @@ class Communication:
                         presion = float(dato.replace('p', ''))
                     elif dato.startswith('a'):
                         altitud = float(dato.replace('a', ''))
-                    elif dato.startswith('AX'):
-                        aceleracion_x = float(dato.replace('AX', ''))
-                    elif dato.startswith('AY'):
-                        aceleracion_y = float(dato.replace('AY', ''))
-                    elif dato.startswith('AZ'):
-                        aceleracion_z = float(dato.replace('AZ', ''))   
-                    elif dato.startswith('GX'):
-                        gyro_x = float(dato.replace('GX', ''))
-                    elif dato.startswith('GY'):
-                        gyro_y = float(dato.replace('GY', ''))
-                    elif dato.startswith('GZ'):
-                        gyro_z = float(dato.replace('GZ', ''))
-                    elif dato.startswith('DM'):
-                        direccion = float(dato.replace('DM', ''))
-                    elif dato.startswith('lat1'):
-                        latitud1 = float(dato.replace('lat1', ''))
-                    elif dato.startswith('lng1'):
-                        longitud1 = float(dato.replace('lng1', ''))
-                    elif dato.startswith('LAT2'):
-                        latitud2 = float(dato.replace('LAT2', ''))
-                    elif dato.startswith('LNG2'):
-                        longitud2 = float(dato.replace('LNG2', ''))
-                    elif dato.startswith('DI'):
-                        distancia = float(dato.replace('DI', ''))
-                    elif dato.startswith('TM'):
-                        tiempo = float(dato.replace('TM', ''))
+                    elif dato.startswith('x'):
+                        aceleracion_x = float(dato.replace('x', ''))
+                    elif dato.startswith('y'):
+                        aceleracion_y = float(dato.replace('y', ''))
+                    elif dato.startswith('z'):
+                        aceleracion_z = float(dato.replace('z', ''))   
+                    elif dato.startswith('g'):
+                        gyro_x = float(dato.replace('g', ''))
+                    elif dato.startswith('i'):
+                        gyro_y = float(dato.replace('i', ''))
+                    elif dato.startswith('r'):
+                        gyro_z = float(dato.replace('r', ''))
+                    elif dato.startswith('l'):
+                        latitud1 = float(dato.replace('l', ''))
+                    elif dato.startswith('n'):
+                        longitud1 = float(dato.replace('n', ''))
+                    elif dato.startswith('u'):
+                        latitud2 = float(dato.replace('u', ''))
+                    elif dato.startswith('o'):
+                        longitud2 = float(dato.replace('o', ''))
+                    elif dato.startswith('d'):
+                        distancia = float(dato.replace('d', ''))
+                    elif dato.startswith('m'):
+                        tiempo = float(dato.replace('m', ''))
 
-                datos_separados = [temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud1, longitud1, latitud2, longitud2, distancia, tiempo]
+                datos_separados = [temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, latitud1, longitud1, latitud2, longitud2, distancia, tiempo]
 
                 return datos_separados
         except Exception as e:

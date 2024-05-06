@@ -4,18 +4,19 @@
 #include <MPU9250_asukiaaa.h>
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
-#include <Servo.h>
-
+#include <PWMServo.h>
+#define SS 10
+#define RST 8
+#define DIO0 2
 byte CargaPrimaria = 0xFF;
 byte CargaSecundaria = 0xCC;
 byte EstacionTerrena = 0xBB;
-String message = "";
 String updateMessage = "";
-
+int contador = 0;
 
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
-Servo servo;
+PWMServo servo;
 
 static const int RXPin = 3, TXPin = 4;
 static const uint32_t GPSBaud = 9600;
@@ -25,7 +26,7 @@ SoftwareSerial ss(RXPin, TXPin);
 
 float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 float presion_inicial, altu, temp, pres;
-double lat1 = 27.967036, lng1 = 110.918653, lat2 = 27.967398, lng2 = 110.918699;
+double lat1, lng1, lat2 = 27.915953, lng2 = -110.920469;
 double distance;
 
 long lastSendTime = 0;  // last send time
@@ -36,10 +37,10 @@ bool maximoAlcanzado = false;
 
 
 void setup() {
-  Serial.begin(115200);
-  servo.attach(6);
-  servo.write(0);
   
+  Serial.begin(115200);
+  
+  LoRa.setPins(SS, RST, DIO0);
   while (!Serial);
   LoRa.setSPIFrequency(433E6);
   Serial.println("Carga Primaria");
@@ -48,8 +49,8 @@ void setup() {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
-
-  
+  servo.attach(9);
+  servo.write(45);
 
   bmp.begin(0x76);
   mpu.beginAccel();
@@ -61,6 +62,7 @@ void setup() {
   mpu.magZOffset = -10;
   presion_inicial = bmp.readPressure() / 100;
   ss.begin(GPSBaud);
+  LoRa.setTxPower(14);
 }
 
 void loop() {
@@ -71,7 +73,7 @@ void loop() {
         lng1 = gps.location.lng();        
         distance = haversine(lat1, lng1, lat2, lng2);
       }
-      distance = haversine(lat1, lng1, lat2, lng2);
+      
     if (mpu.accelUpdate() == 0) {
        aX = mpu.accelX();
        aY = mpu.accelY();
@@ -101,7 +103,7 @@ void loop() {
 
     if(altu <= 1 && maximoAlcanzado){
       //se activa el servo...
-      servo.write(90);
+      servo.write(65);
     }
     
 
@@ -121,11 +123,12 @@ void loop() {
     // }
 
     //Serial.println(distance);
-    sendMessage("t" + String(temp) + "," + "p" + String(pres) + "," + "a" + String(altu) + ","  + "AX" + String(aX) + "," + "AY" + String(aY) + "," + "AZ" + String(aZ) + "," + "GX" + String(gX) + "," + "GY" + String(gY) + "," + "GZ" + String(gZ) + "," + "DM" + String(mDirection)+ "," + "lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2, 6) + "," + "LNG2" + String(lng2, 6) + "," + "DI" + String(distance) + "," + "TM" + String(millis()));
-    //Serial.println("lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2) + "," + "LNG2" + String(lng2) + "," + "DI" + String(distance));
+    sendMessage(String(contador++)+"t" + String(temp) + "," + "p" + String(pres) + "," + "a" + String(altu) + ","  + "x" + String(aX) + "," + "y" + String(aY) + "," + "z" + String(aZ) + "," + "g" + String(gX) + "," + "i" + String(gY) + "," + "r" + String(gZ) + "," + "l" + String(lat1, 6) + "," + "n" + String(lng1, 6) + "," + "u" + String(lat2, 6) + "," + "o" + String(lng2, 6) + "," + "d" + String(distance, 2) + "," + "m" + String(millis()));
+    // sendMessage(String(contador++)+"yeap");
+    // Serial.println("lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2) + "," + "LNG2" + String(lng2) + "," + "DI" + String(distance));
 
     lastSendTime = millis(); 
-    interval = random(145) + 100;  
+    interval = random(50) + 200;  
   }
 
   onReceive(LoRa.parsePacket());
@@ -136,8 +139,6 @@ void loop() {
 void sendMessage(String message) {
   LoRa.beginPacket();
   LoRa.write(EstacionTerrena);
-  LoRa.write(CargaPrimaria);
-  LoRa.write(message.length());
   LoRa.print(message);
   LoRa.endPacket();
   Serial.println(message);
