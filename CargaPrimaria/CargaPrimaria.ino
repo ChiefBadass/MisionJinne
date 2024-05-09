@@ -57,10 +57,7 @@ void setup() {
   mpu.beginAccel();
   mpu.beginGyro();
   mpu.beginMag();
-  //You can set your own offset for mag values
-  mpu.magXOffset = -50;
-  mpu.magYOffset = -55;
-  mpu.magZOffset = -10;
+  
   presion_inicial = bmp.readPressure() / 100;
   ss.begin(GPSBaud);
   LoRa.setTxPower(14);
@@ -85,12 +82,6 @@ void loop() {
        gX = mpu.gyroX();
        gY = mpu.gyroY();
        gZ = mpu.gyroZ();
-     }
-      if (mpu.magUpdate() == 0) {
-       mX = mpu.magX();
-       mY = mpu.magY();
-       mZ = mpu.magZ();
-       mDirection = mpu.magHorizDirection();
      }
   
     temp = (bmp.readTemperature()) - 2.45;
