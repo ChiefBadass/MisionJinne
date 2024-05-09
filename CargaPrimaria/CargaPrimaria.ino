@@ -26,8 +26,9 @@ SoftwareSerial ss(RXPin, TXPin);
 
 float aX, aY, aZ, aSqrt, gX, gY, gZ, mDirection, mX, mY, mZ;
 float presion_inicial, altu, temp, pres;
-double lat1, lng1, lat2 = 27.915953, lng2 = -110.920469;
+double lat1 = 27.966641, lng1 = -110.919777, lat2 = 27.967768, lng2 = -110.919676;
 double distance;
+
 
 long lastSendTime = 0;  // last send time
 int interval = 300;
@@ -71,7 +72,7 @@ void loop() {
       if (gps.encode(ss.read())) {
         lat1 = gps.location.lat();
         lng1 = gps.location.lng();        
-        distance = haversine(lat1, lng1, lat2, lng2);
+        distance = gps.distanceBetween(lat1, lng1, lat2, lng2);
       }
       
     if (mpu.accelUpdate() == 0) {
@@ -122,7 +123,7 @@ void loop() {
     //   }
     // }
 
-    //Serial.println(distance);
+    // Serial.println(distance);
     sendMessage(String(contador++)+"t" + String(temp) + "," + "p" + String(pres) + "," + "a" + String(altu) + ","  + "x" + String(aX) + "," + "y" + String(aY) + "," + "z" + String(aZ) + "," + "g" + String(gX) + "," + "i" + String(gY) + "," + "r" + String(gZ) + "," + "l" + String(lat1, 6) + "," + "n" + String(lng1, 6) + "," + "u" + String(lat2, 6) + "," + "o" + String(lng2, 6) + "," + "d" + String(distance, 2) + "," + "m" + String(millis()));
     // sendMessage(String(contador++)+"yeap");
     // Serial.println("lat1" + String(lat1, 6) + "," + "lng1" + String(lng1, 6) + "," + "LAT2" + String(lat2) + "," + "LNG2" + String(lng2) + "," + "DI" + String(distance));
@@ -184,18 +185,4 @@ void onReceive(int packetSize) {
   lng2 = strtod(lng, NULL);
 
   
-}
-double haversine(float lat1, float lng1, float lat2, double lng2) {
-  double R = 6371.0;
-  lat1 = radians(lat1);
-  lng1 = radians(lng1);
-  lat2 = radians(lat2);
-  lng2 = radians(lng2);
-  double dlat = lat2 - lat1;
-  double dlon = lng2 - lng1;
-  double a = sin(dlat / 2) * sin(dlat / 2) +
-             cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
-  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double distance = R * c;
-  return distance * 1000;
 }
