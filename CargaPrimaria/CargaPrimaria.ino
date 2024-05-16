@@ -4,7 +4,7 @@
 #include <MPU9250_asukiaaa.h>
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
-#include <ServoTimer2.h>
+#include <Servo.h>
 
 byte CargaPrimaria = 0xFF;
 byte CargaSecundaria = 0xCC;
@@ -18,11 +18,10 @@ TinyGPSPlus gps;
 SoftwareSerial ss(RxPinGPS, TxPinGPS);
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
-ServoTimer2 servo;
+Servo servo;
 
 float aceleracionX, aceleracionY, aceleracionZ;
 float giroscopioX, giroscopioY, giroscopioZ;
-float direccionMagnetometro, magnetometroX, magnetometroY, magnetometroZ;
 float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
@@ -59,11 +58,6 @@ void setup() {
   bmp.begin(0x76);
   mpu.beginAccel();
   mpu.beginGyro();
-  mpu.beginMag();
-
-  mpu.magXOffset = -50;
-  mpu.magYOffset = -55;
-  mpu.magZOffset = -10;
 
   presionInicial = bmp.readPressure() / 100;
 }
@@ -89,12 +83,6 @@ void loop() {
        giroscopioX = mpu.gyroX();
        giroscopioY = mpu.gyroY();
        giroscopioZ = mpu.gyroZ();
-     }
-      if (mpu.magUpdate() == 0) {
-       magnetometroX = mpu.magX();
-       magnetometroY = mpu.magY();
-       magnetometroZ = mpu.magZ();
-       direccionMagnetometro = mpu.magHorizDirection();
      }
   
     temperatura = (bmp.readTemperature()) - 2.45;
@@ -137,7 +125,7 @@ void loop() {
     mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
     mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
     mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
-    mensaje += "d" + String(distanciaEntreCargas) + ",";
+    mensaje += "d" + String(distanciaEntreCargas);
 
 
     sendMessage(mensaje);
