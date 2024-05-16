@@ -127,19 +127,18 @@ void loop() {
     mensaje += "t" + String(temperatura) + ",";
     mensaje += "p" + String(presion) + ",";
     mensaje += "a" + String(altura) + ",";
-    mensaje += "AX" + String(aceleracionX) + ",";
-    mensaje += "AY" + String(aceleracionY) + ",";
-    mensaje += "AZ" + String(aceleracionZ) + ",";
-    mensaje += "GX" + String(giroscopioX) + ",";
-    mensaje += "GY" + String(giroscopioY) + ",";
-    mensaje += "GZ" + String(giroscopioZ) + ",";
-    mensaje += "DM" + String(direccionMagnetometro)+ ",";
-    mensaje += "lat1" + String(latitudCargaPrimaria, 6) + ",";
-    mensaje += "lng1" + String(longitudCargaPrimaria, 6) + ",";
-    mensaje += "LAT2" + String(latitudCargaSecundaria, 6) + ",";
-    mensaje += "LNG2" + String(longitudCargaSecundaria, 6) + ",";
-    mensaje += "DI" + String(distanciaEntreCargas) + ",";
-    mensaje += "TM" + String(tiempoEncendido);
+    mensaje += "x" + String(aceleracionX) + ",";
+    mensaje += "y" + String(aceleracionY) + ",";
+    mensaje += "z" + String(aceleracionZ) + ",";
+    mensaje += "g" + String(giroscopioX) + ",";
+    mensaje += "i" + String(giroscopioY) + ",";
+    mensaje += "r" + String(giroscopioZ) + ",";
+    mensaje += "l" + String(latitudCargaPrimaria, 6) + ",";
+    mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
+    mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
+    mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
+    mensaje += "d" + String(distanciaEntreCargas) + ",";
+
 
     sendMessage(mensaje);
 
