@@ -32,26 +32,28 @@ long tiempoEncendido = 0;
 int intervalo = 300;
 
 // se debe de cambiar!!!
-int alturaMaxima = 2;
-int alturaDespliegue = 1;
+int alturaMaxima = 1;
+int alturaDespliegue = 0.5;
 
 bool maximoAlcanzado = false;
 bool mensajeEnviadoALaCargaSecundaria = false;
+bool servoActivado = false;
 
 String mensaje = "";
 
 void setup() {
   Serial.begin(115200);
-  servo.attach(6);
-  servo.write(0);
-  
-  while (!Serial);
+  activarServo(45);
+
+  while (!Serial)
+    ;
   LoRa.setSPIFrequency(433E6);
   Serial.println("Carga Primaria");
 
   if (!LoRa.begin(433E6)) {
     Serial.println("Fallo en iniciar LoRa!");
-    while (1);
+    while (1)
+      ;
   }
 
   ss.begin(GPSBaud);
@@ -70,42 +72,43 @@ void loop() {
     while (ss.available() > 0)
       if (gps.encode(ss.read())) {
         latitudCargaPrimaria = gps.location.lat();
-        longitudCargaPrimaria = gps.location.lng();        
+        longitudCargaPrimaria = gps.location.lng();
         distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
       }
 
     if (mpu.accelUpdate() == 0) {
-       aceleracionX = mpu.accelX();
-       aceleracionY = mpu.accelY();
-       aceleracionZ = mpu.accelZ();
-     }
-     if (mpu.gyroUpdate() == 0) {
-       giroscopioX = mpu.gyroX();
-       giroscopioY = mpu.gyroY();
-       giroscopioZ = mpu.gyroZ();
-     }
-  
+      aceleracionX = mpu.accelX();
+      aceleracionY = mpu.accelY();
+      aceleracionZ = mpu.accelZ();
+    }
+    if (mpu.gyroUpdate() == 0) {
+      giroscopioX = mpu.gyroX();
+      giroscopioY = mpu.gyroY();
+      giroscopioZ = mpu.gyroZ();
+    }
+
     temperatura = (bmp.readTemperature()) - 2.45;
     presion = (bmp.readPressure() / 100);
     altura = (bmp.readAltitude(presionInicial));
 
-    if(altura >= alturaMaxima){
+    if (altura >= alturaMaxima) {
       maximoAlcanzado = true;
     }
 
-    if(altura <= alturaDespliegue && maximoAlcanzado){
+    if (altura <= alturaDespliegue && maximoAlcanzado && !servoActivado) {
       //se activa el servo...
-      servo.write(90);
+      activarServo(65);
+      servoActivado = true;
     }
-    
 
-    if(mensajeContingencia == "c"){
-      servo.write(90);//se activa el servo
+
+    if (mensajeContingencia == "c") {
+      activarServo(65);
     }
 
     int contador = 0;
-    if(altura <= 20 && maximoAlcanzado && !mensajeEnviadoALaCargaSecundaria){
-      while(contador <= 25){
+    if (altura <= 20 && maximoAlcanzado && !mensajeEnviadoALaCargaSecundaria) {
+      while (contador <= 25) {
         enviarMensajeACargaSecundaria("listo");
         contador++;
         delay(20);
@@ -131,8 +134,8 @@ void loop() {
     sendMessage(mensaje);
 
 
-    ultimaVezQueSeEnvioUnMensaje = millis(); 
-    intervalo = random(145) + 100;  
+    ultimaVezQueSeEnvioUnMensaje = millis();
+    intervalo = random(145) + 100;
   }
 
   onReceive(LoRa.parsePacket());
@@ -174,23 +177,21 @@ void onReceive(int packetSize) {
     myMessage += (char)LoRa.read();
   }
 
-  if (myMessageLength != myMessage.length()) return;         
-  
-  if(sender == EstacionTerrena){
+  if (myMessageLength != myMessage.length()) return;
+
+  if (sender == EstacionTerrena) {
     mensajeContingencia = myMessage;
     return;
   }
 
-  char textoChar[20]; // Creamos un array de caracteres para almacenar el string
-  myMessage.toCharArray(textoChar, 20); // Convertimos el string a un array de caracteres
+  char textoChar[20];                    // Creamos un array de caracteres para almacenar el string
+  myMessage.toCharArray(textoChar, 20);  // Convertimos el string a un array de caracteres
 
-  char *lat = strtok(textoChar, ","); 
-  char *lng = strtok(NULL, ","); 
+  char *lat = strtok(textoChar, ",");
+  char *lng = strtok(NULL, ",");
 
-  latitudCargaSecundaria = strtod(lat, NULL); 
+  latitudCargaSecundaria = strtod(lat, NULL);
   longitudCargaSecundaria = strtod(lng, NULL);
-
-  
 }
 double haversine(float lat1, float lng1, float lat2, double lng2) {
   double R = 6371.0;
@@ -200,9 +201,15 @@ double haversine(float lat1, float lng1, float lat2, double lng2) {
   lng2 = radians(lng2);
   double dlat = lat2 - lat1;
   double dlon = lng2 - lng1;
-  double a = sin(dlat / 2) * sin(dlat / 2) +
-             cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
+  double a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
   double distance = R * c;
   return distance * 1000;
+}
+void activarServo(int grados) {
+  servo.attach(6);
+  delay(200);
+  servo.write(grados);
+  delay(200);
+  servo.detach();
 }
