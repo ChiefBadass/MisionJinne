@@ -14,6 +14,7 @@ from graphs.graph_speed import graph_speed
 from graphs.graph_temperature import graph_temperature
 from graphs.graph_time import graph_time
 from graphs.graph_distance import graph_distance
+from map import QGoogleMap
 
 pg.setConfigOption('background', (33, 33, 33))
 pg.setConfigOption('foreground', (197, 198, 199))
@@ -158,7 +159,19 @@ if (ser.isOpen()) or (ser.dummyMode()):
 else:
     print("something is wrong with the update call")
 # Start Qt event loop unless running in interactive mode.
+map_app = QtWidgets.QApplication(sys.argv)
+map = QGoogleMap(api_key='pon tu api key aqui')
+map.show()
+map.waitUntilReady()
+lat, lng = map.centerAtAddress("Guaymas Mexico")
+map.mapMoved.connect(print)
+map.mapClicked.connect(print)
+map.mapRightClicked.connect(print)
+map.mapDoubleClicked.connect(print)
+
+
 
 if __name__ == '__main__':
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtWidgets.QApplication.instance().exec_()
+        map_app.exec_()
