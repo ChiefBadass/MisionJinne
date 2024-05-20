@@ -26,6 +26,7 @@ float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
 double distanciaEntreCargas;
+String orientacion;
 
 long ultimaVezQueSeEnvioUnMensaje = 0;
 long tiempoEncendido = 0;
@@ -45,15 +46,13 @@ void setup() {
   Serial.begin(115200);
   activarServo(45);
 
-  while (!Serial)
-    ;
+  while (!Serial);
   LoRa.setSPIFrequency(433E6);
   Serial.println("Carga Primaria");
 
   if (!LoRa.begin(433E6)) {
     Serial.println("Fallo en iniciar LoRa!");
-    while (1)
-      ;
+    while (1);
   }
 
   ss.begin(GPSBaud);
@@ -73,9 +72,9 @@ void loop() {
       if (gps.encode(ss.read())) {
         latitudCargaPrimaria = gps.location.lat();
         longitudCargaPrimaria = gps.location.lng();
-        distanciaEntreCargas = haversine(latitudCargaPrimaria, longitudCargaPrimaria, latitudCargaSecundaria, longitudCargaSecundaria);
+        distanciaEntreCargas = gps.distanceBetween(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria) * 1000;
+        orientacion = gps.cardinal(gps.courseTo(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria));
       }
-
     if (mpu.accelUpdate() == 0) {
       aceleracionX = mpu.accelX();
       aceleracionY = mpu.accelY();
@@ -128,7 +127,8 @@ void loop() {
     mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
     mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
     mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
-    mensaje += "d" + String(distanciaEntreCargas);
+    mensaje += "d" + String(distanciaEntreCargas) + ",";
+    mensaje += "c" + String(orientacion);
 
 
     sendMessage(mensaje);
@@ -193,19 +193,7 @@ void onReceive(int packetSize) {
   latitudCargaSecundaria = strtod(lat, NULL);
   longitudCargaSecundaria = strtod(lng, NULL);
 }
-double haversine(float lat1, float lng1, float lat2, double lng2) {
-  double R = 6371.0;
-  lat1 = radians(lat1);
-  lng1 = radians(lng1);
-  lat2 = radians(lat2);
-  lng2 = radians(lng2);
-  double dlat = lat2 - lat1;
-  double dlon = lng2 - lng1;
-  double a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
-  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double distance = R * c;
-  return distance * 1000;
-}
+
 void activarServo(int grados) {
   servo.attach(6);
   delay(200);
