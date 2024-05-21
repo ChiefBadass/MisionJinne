@@ -14,10 +14,14 @@ from graphs.graph_speed import graph_speed
 from graphs.graph_temperature import graph_temperature
 from graphs.graph_time import graph_time
 from graphs.graph_distance import graph_distance
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
 
 pg.setConfigOption('background', (33, 33, 33))
 pg.setConfigOption('foreground', (197, 198, 199))
 # Interface variables
+
 app = QtWidgets.QApplication(sys.argv)
 view = pg.GraphicsView()
 Layout = pg.GraphicsLayout()
@@ -25,6 +29,8 @@ view.setCentralItem(Layout)
 view.show()
 view.setWindowTitle('HORUS SPACE LAB - MISION JINNE')
 view.resize(1200, 700)
+
+
 
 # declare object for serial Communication
 ser = Communication()
