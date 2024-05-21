@@ -6,16 +6,13 @@
 #include <SoftwareSerial.h>
 #include <Servo.h>
 
-byte CargaPrimaria = 0xFF;
-byte CargaSecundaria = 0xCC;
-byte EstacionTerrena = 0xBB;
+const PROGMEM byte CargaPrimaria = 0xFF;
+const PROGMEM byte CargaSecundaria = 0xCC;
+const PROGMEM byte EstacionTerrena = 0xBB;
 String mensajeContingencia = "";
 
-static const int RxPinGPS = 3, TxPinGPS = 4;
-static const uint32_t GPSBaud = 9600;
-
 TinyGPSPlus gps;
-SoftwareSerial ss(RxPinGPS, TxPinGPS);
+SoftwareSerial ss(3, 4); // rx, tx
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
 Servo servo;
@@ -25,16 +22,16 @@ float giroscopioX, giroscopioY, giroscopioZ;
 float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
-double distanciaEntreCargas;
-String orientacion;
+// double distanciaEntreCargas;
+// String orientacion;
 
 long ultimaVezQueSeEnvioUnMensaje = 0;
 long tiempoEncendido = 0;
 int intervalo = 300;
 
 // se debe de cambiar!!!
-int alturaMaxima = 1;
-int alturaDespliegue = 0.5;
+const PROGMEM int alturaMaxima = 1;
+const PROGMEM int alturaDespliegue = 0.5;
 
 bool maximoAlcanzado = false;
 bool mensajeEnviadoALaCargaSecundaria = false;
@@ -48,14 +45,14 @@ void setup() {
 
   while (!Serial);
   LoRa.setSPIFrequency(433E6);
-  Serial.println("Carga Primaria");
+  Serial.println(F("Carga Primaria"));
 
   if (!LoRa.begin(433E6)) {
-    Serial.println("Fallo en iniciar LoRa!");
+    Serial.println(F("Fallo en iniciar LoRa!"));
     while (1);
   }
 
-  ss.begin(GPSBaud);
+  ss.begin(9600);
   bmp.begin(0x76);
   mpu.beginAccel();
   mpu.beginGyro();
@@ -72,8 +69,8 @@ void loop() {
       if (gps.encode(ss.read())) {
         latitudCargaPrimaria = gps.location.lat();
         longitudCargaPrimaria = gps.location.lng();
-        distanciaEntreCargas = gps.distanceBetween(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria) * 1000;
-        orientacion = gps.cardinal(gps.courseTo(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria));
+        // distanciaEntreCargas = gps.distanceBetween(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria) * 1000;
+        // orientacion = gps.cardinal(gps.courseTo(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria));
       }
     if (mpu.accelUpdate() == 0) {
       aceleracionX = mpu.accelX();
@@ -127,12 +124,10 @@ void loop() {
     mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
     mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
     mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
-    mensaje += "d" + String(distanciaEntreCargas) + ",";
-    mensaje += "c" + String(orientacion);
-
+    // mensaje += "d" + String(distanciaEntreCargas) + ",";
+    // mensaje += "c" + String(orientacion);
 
     sendMessage(mensaje);
-
 
     ultimaVezQueSeEnvioUnMensaje = millis();
     intervalo = random(145) + 100;
@@ -150,7 +145,7 @@ void sendMessage(String message) {
   LoRa.write(message.length());
   LoRa.print(message);
   LoRa.endPacket();
-  Serial.println(message);
+  // Serial.println(message);
 }
 
 void enviarMensajeACargaSecundaria(String message) {
@@ -160,7 +155,7 @@ void enviarMensajeACargaSecundaria(String message) {
   LoRa.write(message.length());
   LoRa.print(message);
   LoRa.endPacket();
-  Serial.println("Sending packet a carga secundaria");
+  Serial.println(F("Sending packet a carga secundaria"));
   mensajeEnviadoALaCargaSecundaria = true;
 }
 
