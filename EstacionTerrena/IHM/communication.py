@@ -13,37 +13,23 @@ class Communication:
     def __init__(self):
         self.baudrate = 115200
 
-        print("the available ports are (if none appear, press any letter): ")
+        print("Puertos seriales disponibles: ")
         for port in sorted(self.ports):
             # obtener la lista de puetos: https://stackoverflow.com/a/52809180
             print(("{}".format(port)))
-        self.portName = input("write serial port name (ex: /dev/ttyUSB0): ")
+        self.portName = input("Escribe el nombre del puerto (ejemplo: /dev/ttyUSB0): ")
         try:
             self.ser = serial.Serial(self.portName, self.baudrate)
         except serial.serialutil.SerialException:
-            print("Can't open : ", self.portName)
+            print("No se pudo abrir el puerto: ", self.portName)
             #self.dummyPlug = True
-            print("Dummy mode activated")
+            print("Dummy mode activado")
 
     def close(self):
         if (self.ser.isOpen()):
             self.ser.close()
         else:
             print(self.portName, " it's already closed")
-
-    def getData(self):
-        # if (self.dummyMode == False):
-        #     # value = self.ser.readline()  # read line (single value) from the serial port
-        #     # decoded_bytes = str(value[0:len(value) - 2].decode("utf-8"))
-        #     # # print(decoded_bytes)
-        #     # value_chain = decoded_bytes.split(",")
-        #     value_chain = self.obtener_datos_separados()
-
-        # else:
-        
-        value_chain = self.obtener_datos_separados()
-
-        return value_chain
 
     def isOpen(self):
         return self.ser.isOpen()
@@ -61,7 +47,7 @@ class Communication:
             if self.ser.in_waiting > 0:
                 datos_obtenidos = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                 datos = datos_obtenidos.split(',')
-                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud1, longitud1, latitud2, longitud2, distancia, tiempo = [None] * 16
+                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud_carga_primaria, longitud_carga_primaria, latitud_carga_secundaria, longitud_carga_secundaria, distancia, tiempo = [None] * 16
 
                 for dato in datos:
                     if dato.startswith('t'):
@@ -70,34 +56,45 @@ class Communication:
                         presion = float(dato.replace('p', ''))
                     elif dato.startswith('a'):
                         altitud = float(dato.replace('a', ''))
-                    elif dato.startswith('AX'):
-                        aceleracion_x = float(dato.replace('AX', ''))
-                    elif dato.startswith('AY'):
-                        aceleracion_y = float(dato.replace('AY', ''))
-                    elif dato.startswith('AZ'):
-                        aceleracion_z = float(dato.replace('AZ', ''))   
-                    elif dato.startswith('GX'):
-                        gyro_x = float(dato.replace('GX', ''))
-                    elif dato.startswith('GY'):
-                        gyro_y = float(dato.replace('GY', ''))
-                    elif dato.startswith('GZ'):
-                        gyro_z = float(dato.replace('GZ', ''))
-                    elif dato.startswith('DM'):
-                        direccion = float(dato.replace('DM', ''))
-                    elif dato.startswith('lat1'):
-                        latitud1 = float(dato.replace('lat1', ''))
-                    elif dato.startswith('lng1'):
-                        longitud1 = float(dato.replace('lng1', ''))
-                    elif dato.startswith('LAT2'):
-                        latitud2 = float(dato.replace('LAT2', ''))
-                    elif dato.startswith('LNG2'):
-                        longitud2 = float(dato.replace('LNG2', ''))
-                    elif dato.startswith('DI'):
-                        distancia = float(dato.replace('DI', ''))
-                    elif dato.startswith('TM'):
-                        tiempo = float(dato.replace('TM', ''))
+                    elif dato.startswith('x'):
+                        aceleracion_x = float(dato.replace('x', ''))
+                    elif dato.startswith('y'):
+                        aceleracion_y = float(dato.replace('y', ''))
+                    elif dato.startswith('z'):
+                        aceleracion_z = float(dato.replace('z', ''))   
+                    elif dato.startswith('g'):
+                        gyro_x = float(dato.replace('g', ''))
+                    elif dato.startswith('i'):
+                        gyro_y = float(dato.replace('i', ''))
+                    elif dato.startswith('r'):
+                        gyro_z = float(dato.replace('r', ''))
+                    elif dato.startswith('l'):
+                        latitud_carga_primaria = float(dato.replace('l', ''))
+                    elif dato.startswith('n'):
+                        longitud_carga_primaria = float(dato.replace('n', ''))
+                    elif dato.startswith('u'):
+                        latitud_carga_secundaria = float(dato.replace('u', ''))
+                    elif dato.startswith('o'):
+                        longitud_carga_secundaria = float(dato.replace('o', ''))
+                    elif dato.startswith('d'):
+                        distancia = float(dato.replace('d', ''))
 
-                datos_separados = [temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud1, longitud1, latitud2, longitud2, distancia, tiempo]
+                datos_separados = {
+                    'temperatura': temperatura,
+                    'presion': presion,
+                    'altitud': altitud,
+                    'aceleracion_x': aceleracion_x,
+                    'aceleracion_y': aceleracion_y,
+                    'aceleracion_z': aceleracion_z,
+                    'gyro_x': gyro_x,
+                    'gyro_y': gyro_y,
+                    'gyro_z': gyro_z,
+                    'latitud_carga_primaria': latitud_carga_primaria,
+                    'longitud_carga_secundaria': longitud_carga_primaria,
+                    'latitud_carga_secundaria': latitud_carga_secundaria,
+                    'longitud_carga_secundaria': longitud_carga_secundaria,
+                    'distancia': distancia
+                }
 
                 return datos_separados
         except Exception as e:

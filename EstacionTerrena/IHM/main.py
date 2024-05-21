@@ -4,7 +4,8 @@ import pyqtgraph as pg
 from communication import Communication
 from dataBase import data_base
 from PyQt5.QtWidgets import QPushButton
-from graphs.graph_acceleration import graph_acceleration
+
+from graphs.grafica_aceleracion import GraficaAceleracion
 from graphs.graph_altitude import graph_altitude
 from graphs.graph_battery import graph_battery
 from graphs.graph_free_fall import graph_free_fall
@@ -35,51 +36,38 @@ font = QtGui.QFont()
 font.setPixelSize(90)
 
 # buttons style
-style = "background-color:rgb(29, 185, 84);color:rgb(0,0,0);font-size:14px;"
-styleE = "background-color:rgb(255, 0, 0);color:rgb(255,255,255);font-size:14px; width: 200px; height: 100px;"
+boton_estilo = "background-color:rgb(29, 185, 84);color:rgb(0,0,0);font-size:14px;"
+boton_emergencia_estilo = "background-color:rgb(255, 0, 0);color:rgb(255,255,255);font-size:14px; width: 200px; height: 100px;"
 
-
-# Declare graphs
 # Button 1
 proxy = QtWidgets.QGraphicsProxyWidget()
 save_button = QtWidgets.QPushButton('Iniciar almacenamiento')
-save_button.setStyleSheet(style)
+save_button.setStyleSheet(boton_estilo)
 save_button.clicked.connect(data_base.start)
 proxy.setWidget(save_button)
-
 
 # Button 2
 proxy2 = QtWidgets.QGraphicsProxyWidget()
 end_save_button = QtWidgets.QPushButton('Deneter almacenamiento')
-end_save_button.setStyleSheet(style)
+end_save_button.setStyleSheet(boton_estilo)
 end_save_button.clicked.connect(data_base.stop)
 proxy2.setWidget(end_save_button)
+
 # Button Emergency
 proxy3 = QtWidgets.QGraphicsProxyWidget()
 emergency_buttom = QtWidgets.QPushButton('Despliegue de Emergencia')
-emergency_buttom.setStyleSheet(styleE)
+emergency_buttom.setStyleSheet(boton_emergencia_estilo)
 emergency_buttom.clicked.connect(ser.paro_emergencia)
 proxy3.setWidget(emergency_buttom)
 
-# Altitude graph
-altitude = graph_altitude()
-# Speed graph
-speed = graph_speed()
-# Acceleration graph
-# acceleration = graph_acceleration()
-# Gyro graph
-gyro = graph_gyro()
-# Pressure Graph
-pressure = graph_pressure()
-# Temperature graph
-temperature = graph_temperature()
-
-distance = graph_distance()
-# Time graph
+# Inicializacion de graficas
+grafica_altitud = graph_altitude()
+grafica_aceleraciones = GraficaAceleracion()
+grafica_giroscopio = graph_gyro()
+grafica_presion = graph_pressure()
+grafica_temperatura = graph_temperature()
+grafica_distancia = graph_distance()
 time = graph_time(font=font)
-# Battery graph
-# battery = graph_battery(font=font)
-# Free fall graph
 free_fall = graph_free_fall(font=font)
 
 
@@ -94,22 +82,22 @@ l1 = Layout.addLayout(colspan=10, rowspan=2)
 l11 = l1.addLayout(rowspan=1, border=(83, 83, 83))
 
 # Altitude, speed
-l11.addItem(altitude)
-l11.addItem(temperature)
+l11.addItem(grafica_altitud)
+l11.addItem(grafica_temperatura)
 
 # l11.addItem(speed)
 l1.nextRow()
 
 # Acceleration, gyro, pressure, temperature
 l12 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-l12.addItem(pressure)
-l12.addItem(speed)
+l12.addItem(grafica_presion)
+l12.addItem(grafica_aceleraciones)
 
 # l12.addItem(pressure)
 l1.nextRow()
 l13 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-l13.addItem(gyro)
-l13.addItem(distance)
+l13.addItem(grafica_giroscopio)
+l13.addItem(grafica_distancia)
 l1.nextRow()
 
 # Time, battery and free fall graphs
@@ -121,32 +109,20 @@ l2.addItem(proxy3)
 l2.nextCol()
 l2.addItem(free_fall)
 
-# you have to put the position of the CSV stored in the value_chain list
-# that represent the date you want to visualize
-
-
 def update():
     try:
-        value_chain = ser.getData()
-        # value_chain = [1, 3]
-        temperature.update(value_chain[0])
-        pressure.update(value_chain[1])
-        altitude.update(value_chain[2])
-        speed.update(value_chain[3], value_chain[4], value_chain[5])
-        gyro.update(value_chain[6], value_chain[7], value_chain[8])
-        time.update(value_chain[15])
-        distance.update(value_chain[10], value_chain[11], value_chain[12], value_chain[13], value_chain[14])
+        datos = ser.obtener_datos_separados()
+
+        grafica_temperatura.update(datos['temperatura'])
+        grafica_presion.update(datos['presion'])
+        grafica_altitud.update(datos['altitud'])
+        grafica_aceleraciones.update(datos['aceleracion_x'], datos['aceleracion_y'], datos['aceleracion_z'])
+        grafica_giroscopio.update(datos['gyro_x'], datos['gyro_y'], datos['gyro_z'])
+        grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'])
+
         archivo = open('C:/Users/carlo/Documents/python/Mision_Jinne-main/flight_data.csv', 'a')
-        archivo.write(f"{value_chain}/n")
+        archivo.write(f"{datos}/n")
         archivo.close()
-        
-        #acceleration.update(value_chain[3], value_chain[4], value_chain[5])
-        
-        # free_fall.update(value_chain[2])
-        #data_base.guardar(value_chain)
-
-        
-
     except IndexError:
         print('starting, please wait a moment')
 
