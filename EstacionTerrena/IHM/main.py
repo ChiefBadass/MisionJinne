@@ -50,20 +50,22 @@ class MainWindow(QtWidgets.QMainWindow):
         title_label.setAlignment(QtCore.Qt.AlignCenter)
         title_label.setStyleSheet("""
             color: white; 
+            margin-left: -80px;
             font-size: 20px;
             font-weight: bold;
         """)
         
         # Crear el label para el icono del título
         icon_label = QtWidgets.QLabel()
-        pixmap = QPixmap('xd.jpg')  # Asegúrate de que 'logo.png' está en el directorio correcto
+        pixmap = QPixmap('MisionJinne.png')  # Asegúrate de que 'logo.png' está en el directorio correcto
         icon_label.setPixmap(pixmap)
-        icon_label.setFixedSize(200, 200)  # Ajustar el tamaño del icono
+        icon_label.setFixedSize(32, 32)  # Ajustar el tamaño del icono
 
         # Añadir el label al widget del título
         title_layout = QtWidgets.QHBoxLayout(title_bar)
         title_layout.addWidget(icon_label)
         title_layout.addWidget(title_label)
+        
 
         # Crear la vista y el layout de pyqtgraph
         view = pg.GraphicsView()
@@ -83,61 +85,90 @@ class MainWindow(QtWidgets.QMainWindow):
     def initialize_graphics_and_buttons(self, Layout):
         # Fonts for text items
         font = QtGui.QFont()
-        font.setPixelSize(90)
+        font.setPixelSize(20)
 
         # Buttons style
         boton_estilo = "background-color:rgb(29, 185, 84);color:rgb(0,0,0);font-size:14px;"
-        boton_emergencia_estilo = "background-color:rgb(255, 0, 0);color:rgb(255,255,255);font-size:14px; width: 200px; height: 100px;"
+        # Botón de emergencia
+        boton_emergencia_estilo = """
+            background-color: rgba(255, 0, 0, 0);  /* Fondo transparente */
+            color: rgba(255, 255, 255, 0);         /* Texto transparente */
+            font-size: 14px;
+            width: 200px;
+            height: 50px;
+            border: none;                          /* Sin borde */
+            outline: none;
+        """
 
     
 
         # Button Emergency
         proxy3 = QtWidgets.QGraphicsProxyWidget()
-        emergency_button = QtWidgets.QPushButton('Despliegue de Emergencia')
+        emergency_button = QtWidgets.QPushButton()
         emergency_button.setStyleSheet(boton_emergencia_estilo)
         emergency_button.clicked.connect(self.ser.paro_emergencia)
+        emergency_button.setFixedSize(200,50)
         proxy3.setWidget(emergency_button)
+        
 
         # Inicialización de gráficos como atributos de la clase
         self.grafica_altitud = graph_altitude()
+        self.grafica_altitud.setFixedWidth(900)
+        
         self.grafica_aceleraciones = GraficaAceleracion()
+        self.grafica_aceleraciones.setFixedWidth(900)
+        
         self.grafica_giroscopio = graph_gyro()
+        self.grafica_giroscopio.setFixedWidth(900)
+        
         self.grafica_presion = graph_pressure()
+        self.grafica_presion.setFixedWidth(900)
+        
         self.grafica_temperatura = graph_temperature()
+        self.grafica_temperatura.setFixedWidth(900)
+        
         self.grafica_distancia = graph_distance()
+        self.grafica_distancia.setFixedWidth(900)
+        
         self.time = graph_time(font=font)
-        self.free_fall = graph_free_fall(font=font)
+        self.time.setFixedHeight(50)
+        self.time.setFixedWidth(200)
 
        
 
         l1 = Layout.addLayout(colspan=10, rowspan=2)
+        
         l11 = l1.addLayout(rowspan=1, border=(83, 83, 83))
+        l11.setSpacing(65)
+        
+
 
         # Altitude, speed
         l11.addItem(self.grafica_altitud)
+        
         l11.addItem(self.grafica_temperatura)
 
         l1.nextRow()
 
         # Acceleration, gyro, pressure, temperature
         l12 = l1.addLayout(rowspan=1, border=(83, 83, 83))
+        l12.setSpacing(65)
         l12.addItem(self.grafica_presion)
         l12.addItem(self.grafica_aceleraciones)
 
         l1.nextRow()
         l13 = l1.addLayout(rowspan=1, border=(83, 83, 83))
+        l13.setSpacing(65)
         l13.addItem(self.grafica_giroscopio)
         l13.addItem(self.grafica_distancia)
         l1.nextRow()
 
         # Time, battery and free fall graphs
-        l2 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-        l2.setFixedHeight(100)
+        l2 = l1.addLayout(rowspan=1)
+        
         l2.addItem(self.time)
         l2.nextCol()
-        l2.addItem(self.free_fall)
-        l2.nextCol()
-        
+       
         l2.addItem(proxy3)
 
     def setup_update_timer(self):

@@ -6,7 +6,7 @@ class graph_gyro(pg.PlotItem):
     def __init__(self, parent=None, name=None, labels=None, title='Gyro', viewBox=None, axisItems=None, enableMenu=True, **kargs):
         super().__init__(parent, name, labels, title, viewBox, axisItems, enableMenu, **kargs)
 
-        self.hideAxis('bottom')
+        
         # adding legend
         self.addLegend()
         self.pitch_plot = self.plot(pen=(102, 252, 241), name="X")

@@ -10,6 +10,7 @@ class graph_altitude(pg.PlotItem):
         self.altitude_plot = self.plot(pen=(29, 185, 84))
         self.altitude_data = np.linspace(0, 0, 30)
         self.ptr1 = 0
+       
 
     def update(self, value):
         #self.altitude_plot, self.altitude_data,  self.ptr1

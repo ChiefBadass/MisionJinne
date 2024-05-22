@@ -7,7 +7,6 @@ class GraficaAceleracion(pg.PlotItem):
         super().__init__(parent, name, labels, title, viewBox, axisItems, enableMenu, **kargs)
         
         self.addLegend()
-        self.hideAxis('bottom')
 
         self.accX_plot = self.plot(pen=(102, 252, 241), name="X")
         self.accY_plot = self.plot(pen=(29, 185, 84), name="Y")
