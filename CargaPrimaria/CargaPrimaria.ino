@@ -120,10 +120,10 @@ void loop() {
     mensaje += "g" + String(giroscopioX, 1) + ",";
     mensaje += "i" + String(giroscopioY, 1) + ",";
     mensaje += "r" + String(giroscopioZ, 1) + ",";
-    mensaje += "l" + String(latitudCargaPrimaria) + ",";
-    mensaje += "n" + String(longitudCargaPrimaria) + ",";
-    mensaje += "u" + String(latitudCargaSecundaria) + ",";
-    mensaje += "o" + String(longitudCargaSecundaria) + ",";
+    mensaje += "l" + String(latitudCargaPrimaria, 6) + ",";
+    mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
+    mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
+    mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
     mensaje += "d" + String(distanciaEntreCargas) + ",";
     mensaje += "c" + String(orientacion);
 
