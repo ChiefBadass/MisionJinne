@@ -9,9 +9,9 @@ class graph_gyro(pg.PlotItem):
         
         # adding legend
         self.addLegend()
-        self.pitch_plot = self.plot(pen=(102, 252, 241), name="X")
-        self.roll_plot = self.plot(pen=(29, 185, 84), name="Y")
-        self.yaw_plot = self.plot(pen=(203, 45, 111), name="Z")
+        self.pitch_plot = self.plot(pen=(205, 41, 46), name="X")
+        self.roll_plot = self.plot(pen=(93, 205, 41), name="Y")
+        self.yaw_plot = self.plot(pen=(41, 76, 205), name="Z")
 
         self.pitch_data = np.linspace(0, 0)
         self.roll_data = np.linspace(0, 0)

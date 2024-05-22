@@ -130,6 +130,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.grafica_distancia = graph_distance()
         self.grafica_distancia.setFixedWidth(900)
         
+        
         self.time = graph_time(font=font)
         self.time.setFixedHeight(50)
         self.time.setFixedWidth(200)

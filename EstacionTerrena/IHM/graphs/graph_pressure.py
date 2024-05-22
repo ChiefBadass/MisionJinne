@@ -7,7 +7,7 @@ class graph_pressure(pg.PlotItem):
     def __init__(self, parent=None, name=None, labels=None, title='Presión Barométrica', viewBox=None, axisItems=None, enableMenu=True, **kargs):
         super().__init__(parent, name, labels, title, viewBox, axisItems, enableMenu, **kargs)
 
-        self.pressure_plot = self.plot(pen=(102, 252, 241))
+        self.pressure_plot = self.plot(pen=(205, 41, 46))
         self.pressure_data = np.linspace(0, 0, 30)
         self.ptr = 0
 
