@@ -22,8 +22,8 @@ float giroscopioX, giroscopioY, giroscopioZ;
 float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
-// double distanciaEntreCargas;
-// String orientacion;
+double distanciaEntreCargas;
+String orientacion;
 
 long ultimaVezQueSeEnvioUnMensaje = 0;
 long tiempoEncendido = 0;
@@ -69,8 +69,8 @@ void loop() {
       if (gps.encode(ss.read())) {
         latitudCargaPrimaria = gps.location.lat();
         longitudCargaPrimaria = gps.location.lng();
-        // distanciaEntreCargas = gps.distanceBetween(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria) * 1000;
-        // orientacion = gps.cardinal(gps.courseTo(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria));
+        distanciaEntreCargas = gps.distanceBetween(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria);
+        orientacion = gps.cardinal(gps.courseTo(gps.location.lat(), gps.location.lng(), latitudCargaSecundaria, longitudCargaSecundaria));
       }
     if (mpu.accelUpdate() == 0) {
       aceleracionX = mpu.accelX();
@@ -111,26 +111,26 @@ void loop() {
       }
     }
 
-    mensaje += "t" + String(temperatura) + ",";
-    mensaje += "p" + String(presion) + ",";
-    mensaje += "a" + String(altura) + ",";
-    mensaje += "x" + String(aceleracionX) + ",";
-    mensaje += "y" + String(aceleracionY) + ",";
-    mensaje += "z" + String(aceleracionZ) + ",";
-    mensaje += "g" + String(giroscopioX) + ",";
-    mensaje += "i" + String(giroscopioY) + ",";
-    mensaje += "r" + String(giroscopioZ) + ",";
-    mensaje += "l" + String(latitudCargaPrimaria, 6) + ",";
-    mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
-    mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
-    mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
-    // mensaje += "d" + String(distanciaEntreCargas) + ",";
-    // mensaje += "c" + String(orientacion);
+    mensaje += "t" + String(temperatura, 1) + ",";
+    mensaje += "p" + String(presion, 1) + ",";
+    mensaje += "a" + String(altura, 1) + ",";
+    mensaje += "x" + String(aceleracionX, 1) + ",";
+    mensaje += "y" + String(aceleracionY, 1) + ",";
+    mensaje += "z" + String(aceleracionZ, 1) + ",";
+    mensaje += "g" + String(giroscopioX, 1) + ",";
+    mensaje += "i" + String(giroscopioY, 1) + ",";
+    mensaje += "r" + String(giroscopioZ, 1) + ",";
+    mensaje += "l" + String(latitudCargaPrimaria) + ",";
+    mensaje += "n" + String(longitudCargaPrimaria) + ",";
+    mensaje += "u" + String(latitudCargaSecundaria) + ",";
+    mensaje += "o" + String(longitudCargaSecundaria) + ",";
+    mensaje += "d" + String(distanciaEntreCargas) + ",";
+    mensaje += "c" + String(orientacion);
 
     sendMessage(mensaje);
 
     ultimaVezQueSeEnvioUnMensaje = millis();
-    intervalo = random(145) + 100;
+    intervalo = random(50) + 200;
   }
 
   onReceive(LoRa.parsePacket());
@@ -145,7 +145,7 @@ void sendMessage(String message) {
   LoRa.write(message.length());
   LoRa.print(message);
   LoRa.endPacket();
-  // Serial.println(message);
+  Serial.println(message);
 }
 
 void enviarMensajeACargaSecundaria(String message) {
