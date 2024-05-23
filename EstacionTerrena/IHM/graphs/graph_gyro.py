@@ -3,7 +3,7 @@ import numpy as np
 
 class graph_gyro(pg.PlotItem):
     
-    def __init__(self, parent=None, name=None, labels=None, title='Gyro', viewBox=None, axisItems=None, enableMenu=True, **kargs):
+    def __init__(self, parent=None, name=None, labels=None, title='Aceleraciones angulares', viewBox=None, axisItems=None, enableMenu=True, **kargs):
         super().__init__(parent, name, labels, title, viewBox, axisItems, enableMenu, **kargs)
 
         

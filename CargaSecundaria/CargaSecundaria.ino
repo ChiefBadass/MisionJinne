@@ -3,13 +3,13 @@
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
 
-static const int RXPin = 3, TXPin = 4;
+
 static const uint32_t GPSBaud = 9600;
 
 TinyGPSPlus gps;
 
 //The serial connection to the GPS device
-SoftwareSerial gss(RXPin, TXPin);
+SoftwareSerial gss(4, 3);
 
 double lat;
 double lng;
@@ -18,7 +18,7 @@ byte CargaSecundaria = 0xCC;
 byte CargaPrimaria = 0xFF;
 byte EstacionTerrena = 0xBB;
 String myMessage = "";
-String updateMessage = "listo";
+String updateMessage = "";
 int counter = 1;
 int c = 0;
 
@@ -33,6 +33,7 @@ void setup() {
     Serial.println("Starting LoRa failed!");
     while (1);
   }
+  
 }
 
 

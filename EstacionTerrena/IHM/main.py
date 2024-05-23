@@ -2,18 +2,14 @@ import sys
 from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 import pyqtgraph as pg
 from communication import Communication
-from dataBase import data_base
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtGui import QIcon, QPixmap
-from map import QGoogleMap
+import datetime as dt
 
 from graphs.grafica_aceleracion import GraficaAceleracion
 from graphs.graph_altitude import graph_altitude
-from graphs.graph_battery import graph_battery
-from graphs.graph_free_fall import graph_free_fall
 from graphs.graph_gyro import graph_gyro
 from graphs.graph_pressure import graph_pressure
-from graphs.graph_speed import graph_speed
 from graphs.graph_temperature import graph_temperature
 from graphs.graph_time import graph_time
 from graphs.graph_distance import graph_distance
@@ -31,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Declarar objetos de comunicación y almacenamiento
         self.ser = Communication()
-        self.data_base = data_base()
+        
 
         # Crear el widget central
         central_widget = QtWidgets.QWidget()
@@ -115,22 +111,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Inicialización de gráficos como atributos de la clase
         self.grafica_altitud = graph_altitude()
-        self.grafica_altitud.setFixedWidth(900)
+        self.grafica_altitud.setFixedWidth(920)
         
         self.grafica_aceleraciones = GraficaAceleracion()
-        self.grafica_aceleraciones.setFixedWidth(900)
+        self.grafica_aceleraciones.setFixedWidth(920)
         
         self.grafica_giroscopio = graph_gyro()
-        self.grafica_giroscopio.setFixedWidth(900)
+        self.grafica_giroscopio.setFixedWidth(920)
         
         self.grafica_presion = graph_pressure()
-        self.grafica_presion.setFixedWidth(900)
+        self.grafica_presion.setFixedWidth(920)
         
         self.grafica_temperatura = graph_temperature()
-        self.grafica_temperatura.setFixedWidth(900)
+        self.grafica_temperatura.setFixedWidth(920)
         
         self.grafica_distancia = graph_distance()
-        self.grafica_distancia.setFixedWidth(900)
+        self.grafica_distancia.setFixedWidth(920)
         
         
         self.time = graph_time(font=font)
@@ -142,7 +138,7 @@ class MainWindow(QtWidgets.QMainWindow):
         l1 = Layout.addLayout(colspan=10, rowspan=2)
         
         l11 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-        l11.setSpacing(65)
+        l11.setSpacing(25)
         
 
 
@@ -155,13 +151,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Acceleration, gyro, pressure, temperature
         l12 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-        l12.setSpacing(65)
+        l12.setSpacing(25)
         l12.addItem(self.grafica_presion)
         l12.addItem(self.grafica_aceleraciones)
 
         l1.nextRow()
         l13 = l1.addLayout(rowspan=1, border=(83, 83, 83))
-        l13.setSpacing(65)
+        l13.setSpacing(25)
         l13.addItem(self.grafica_giroscopio)
         l13.addItem(self.grafica_distancia)
         l1.nextRow()
@@ -195,7 +191,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.time.update(datos['tiempo'])
 
         
-            with open('C:/Users/carlo/Documents/python/Mision_Jinne-main/flight_data.csv', 'a') as archivo:
+            with open(f'C:/Users/carlo/Documents/python/Mision_Jinne/datos_{dt.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.csv', 'a') as archivo:
                 archivo.write(f"{datos}\n")
         except IndexError:
             print('starting, please wait a moment')

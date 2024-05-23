@@ -12,7 +12,7 @@ const PROGMEM byte EstacionTerrena = 0xBB;
 String mensajeContingencia = "";
 
 TinyGPSPlus gps;
-SoftwareSerial ss(3, 4); // rx, tx
+SoftwareSerial ss(4, 3); // rx, tx
 Adafruit_BMP280 bmp;  // I2C
 MPU9250_asukiaaa mpu;
 Servo servo;
@@ -47,7 +47,10 @@ void setup() {
   LoRa.setSPIFrequency(433E6);
   Serial.println(F("Carga Primaria"));
 
-  
+  if (!LoRa.begin(433E6)) {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
 
   ss.begin(9600);
   bmp.begin(0x76);

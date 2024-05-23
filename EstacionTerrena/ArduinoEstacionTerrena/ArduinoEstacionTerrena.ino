@@ -7,8 +7,6 @@ String inString = "";   //hold incoming characters
 String myMessage = "";  // hold compleye message
 
 
-long lastSendTime = 0;        // last send time
-int interval = 300;  
 void setup() {
   Serial.begin(115200);
 
@@ -64,19 +62,15 @@ if (packetSize == 0) return;
   byte sender = LoRa.read();
   byte messageLenth = LoRa.read();
   String myMessage = "";
-  if (recipient != EstacionTerrena ) {
-    Serial.println("This message is not for me.");
-    return;                            
-  }
+  if (recipient != EstacionTerrena )return;                            
+  
   
   while (LoRa.available()) {
     myMessage += (char)LoRa.read();
   }
  
-  if (messageLenth != myMessage.length()) {   // check length for error
-    Serial.println("error: message length does not match length");
-    return;                             // skip rest of function
-  }
+  if (messageLenth != myMessage.length()) return;                             // skip rest of function
+  
     
   Serial.println(myMessage);
   

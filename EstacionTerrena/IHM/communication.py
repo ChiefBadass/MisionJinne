@@ -104,5 +104,5 @@ class Communication:
 
                 return datos_separados
         except Exception as e:
-            print(e)
+            pass
             # print("fallo recepcion de datos")
