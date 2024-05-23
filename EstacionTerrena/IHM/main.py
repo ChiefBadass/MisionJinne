@@ -17,6 +17,8 @@ from graphs.graph_distance import graph_distance
 pg.setConfigOption('background', (236, 236, 236))
 pg.setConfigOption('foreground', (0, 0, 0))
 
+archivo_nombre = dt.datetime.now().strftime("%d_%m_%Y_%H_%M_%S") 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -178,23 +180,28 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             print("something is wrong with the update call")
 
+
+
     def update(self):
         try:
             datos = self.ser.obtener_datos_separados()
-            print(datos)
-            self.grafica_temperatura.update(datos['temperatura'])
-            self.grafica_presion.update(datos['presion'])
-            self.grafica_altitud.update(datos['altitud'])
-            self.grafica_aceleraciones.update(datos['aceleracion_x'], datos['aceleracion_y'], datos['aceleracion_z'])
-            self.grafica_giroscopio.update(datos['gyro_x'], datos['gyro_y'], datos['gyro_z'])
-            self.grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'], datos['cardinal'])
-            self.time.update(datos['tiempo'])
 
-        
-            with open(f'C:/Users/carlo/Documents/python/Mision_Jinne/datos_{dt.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")}.csv', 'a') as archivo:
+            if datos is not None:
+                print(datos)
+
+                self.grafica_temperatura.update(datos['temperatura'])
+                self.grafica_presion.update(datos['presion'])
+                self.grafica_altitud.update(datos['altitud'])
+                self.grafica_aceleraciones.update(datos['aceleracion_x'], datos['aceleracion_y'], datos['aceleracion_z'])
+                self.grafica_giroscopio.update(datos['gyro_x'], datos['gyro_y'], datos['gyro_z'])
+                self.grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'], datos['cardinal'])
+                self.time.update(datos['tiempo'])
+
+                archivo = open(f'datos_{archivo_nombre}.csv', 'a')
                 archivo.write(f"{datos}\n")
-        except IndexError:
-            print('starting, please wait a moment')
+
+        except Exception as e:
+            pass
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
