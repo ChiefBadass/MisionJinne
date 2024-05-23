@@ -47,7 +47,7 @@ class Communication:
             if self.ser.in_waiting > 0:
                 datos_obtenidos = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                 datos = datos_obtenidos.split(',')
-                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, direccion, latitud_carga_primaria, longitud_carga_primaria, latitud_carga_secundaria, longitud_carga_secundaria, distancia, tiempo = [None] * 16
+                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, latitud_carga_primaria, longitud_carga_primaria, latitud_carga_secundaria, longitud_carga_secundaria, distancia, cardinal,  tiempo = [None] * 16
 
                 for dato in datos:
                     if dato.startswith('t'):
@@ -78,6 +78,10 @@ class Communication:
                         longitud_carga_secundaria = float(dato.replace('o', ''))
                     elif dato.startswith('d'):
                         distancia = float(dato.replace('d', ''))
+                    elif dato.startswith('c'):
+                        cardinal = dato.replace('c', '')
+                    elif dato.startswith('m'):
+                        tiempo = float(dato.replace('m', ''))
 
                 datos_separados = {
                     'temperatura': temperatura,
@@ -90,10 +94,12 @@ class Communication:
                     'gyro_y': gyro_y,
                     'gyro_z': gyro_z,
                     'latitud_carga_primaria': latitud_carga_primaria,
-                    'longitud_carga_secundaria': longitud_carga_primaria,
+                    'longitud_carga_primaria': longitud_carga_primaria,
                     'latitud_carga_secundaria': latitud_carga_secundaria,
                     'longitud_carga_secundaria': longitud_carga_secundaria,
-                    'distancia': distancia
+                    'distancia': distancia,
+                    'cardinal' : cardinal,
+                    'tiempo' : tiempo
                 }
 
                 return datos_separados

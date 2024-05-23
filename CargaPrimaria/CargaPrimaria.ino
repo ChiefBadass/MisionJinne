@@ -22,8 +22,8 @@ float giroscopioX, giroscopioY, giroscopioZ;
 float presionInicial, altura, temperatura, presion;
 double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
-// double distanciaEntreCargas;
-// String orientacion;
+double distanciaEntreCargas;
+String orientacion;
 
 long ultimaVezQueSeEnvioUnMensaje = 0;
 long tiempoEncendido = 0;
@@ -47,10 +47,7 @@ void setup() {
   LoRa.setSPIFrequency(433E6);
   Serial.println(F("Carga Primaria"));
 
-  if (!LoRa.begin(433E6)) {
-    Serial.println(F("Fallo en iniciar LoRa!"));
-    while (1);
-  }
+  
 
   ss.begin(9600);
   bmp.begin(0x76);
@@ -124,13 +121,14 @@ void loop() {
     mensaje += "n" + String(longitudCargaPrimaria, 6) + ",";
     mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
     mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
-    // mensaje += "d" + String(distanciaEntreCargas) + ",";
-    // mensaje += "c" + String(orientacion);
+    mensaje += "d" + String(distanciaEntreCargas) + ",";
+    mensaje += "c" + String(orientacion) + ",";
+    mensaje += "m" + String(millis());
 
     sendMessage(mensaje);
 
     ultimaVezQueSeEnvioUnMensaje = millis();
-    intervalo = random(145) + 100;
+    intervalo = random(50) + 200;
   }
 
   onReceive(LoRa.parsePacket());

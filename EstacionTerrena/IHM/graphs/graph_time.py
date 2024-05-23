@@ -23,4 +23,4 @@ class graph_time(pg.PlotItem):
         seconds = total_seconds % 60
         self.tiempo = f"{minutes}.{seconds}"
         
-        self.time_text.setText("Time: " + str(self.tiempo))
+        self.time_text.setText("Tiempo: " + str(self.tiempo) + " min")

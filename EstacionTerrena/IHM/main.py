@@ -5,6 +5,7 @@ from communication import Communication
 from dataBase import data_base
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtGui import QIcon, QPixmap
+from map import QGoogleMap
 
 from graphs.grafica_aceleracion import GraficaAceleracion
 from graphs.graph_altitude import graph_altitude
@@ -16,6 +17,7 @@ from graphs.graph_speed import graph_speed
 from graphs.graph_temperature import graph_temperature
 from graphs.graph_time import graph_time
 from graphs.graph_distance import graph_distance
+
 pg.setConfigOption('background', (236, 236, 236))
 pg.setConfigOption('foreground', (0, 0, 0))
 
@@ -25,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setWindowTitle('HORUS SPACE LAB - MISION JINNE')
         self.setWindowIcon(QIcon('xd.jpg'))  # Añadir el icono aquí
-        self.resize(1200, 700)
+        self.showMaximized()
 
         # Declarar objetos de comunicación y almacenamiento
         self.ser = Communication()
@@ -183,14 +185,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def update(self):
         try:
             datos = self.ser.obtener_datos_separados()
-
+            print(datos)
             self.grafica_temperatura.update(datos['temperatura'])
             self.grafica_presion.update(datos['presion'])
             self.grafica_altitud.update(datos['altitud'])
             self.grafica_aceleraciones.update(datos['aceleracion_x'], datos['aceleracion_y'], datos['aceleracion_z'])
             self.grafica_giroscopio.update(datos['gyro_x'], datos['gyro_y'], datos['gyro_z'])
-            self.grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'])
+            self.grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'], datos['cardinal'])
+            self.time.update(datos['tiempo'])
 
+        
             with open('C:/Users/carlo/Documents/python/Mision_Jinne-main/flight_data.csv', 'a') as archivo:
                 archivo.write(f"{datos}\n")
         except IndexError:
