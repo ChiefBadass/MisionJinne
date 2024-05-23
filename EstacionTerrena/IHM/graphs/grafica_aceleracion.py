@@ -7,11 +7,10 @@ class GraficaAceleracion(pg.PlotItem):
         super().__init__(parent, name, labels, title, viewBox, axisItems, enableMenu, **kargs)
         
         self.addLegend()
-        self.hideAxis('bottom')
 
-        self.accX_plot = self.plot(pen=(102, 252, 241), name="X")
-        self.accY_plot = self.plot(pen=(29, 185, 84), name="Y")
-        self.accZ_plot = self.plot(pen=(203, 45, 111), name="Z")
+        self.accX_plot = self.plot(pen=(205, 41, 46), name="X")
+        self.accY_plot = self.plot(pen=(93, 205, 41), name="Y")
+        self.accZ_plot = self.plot(pen=(41, 76, 205), name="Z")
 
         self.accX_data = np.linspace(0, 0)
         self.accY_data = np.linspace(0, 0)

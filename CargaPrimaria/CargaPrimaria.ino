@@ -47,10 +47,7 @@ void setup() {
   LoRa.setSPIFrequency(433E6);
   Serial.println(F("Carga Primaria"));
 
-  if (!LoRa.begin(433E6)) {
-    Serial.println(F("Fallo en iniciar LoRa!"));
-    while (1);
-  }
+  
 
   ss.begin(9600);
   bmp.begin(0x76);
@@ -125,7 +122,8 @@ void loop() {
     mensaje += "u" + String(latitudCargaSecundaria, 6) + ",";
     mensaje += "o" + String(longitudCargaSecundaria, 6) + ",";
     mensaje += "d" + String(distanciaEntreCargas) + ",";
-    mensaje += "c" + String(orientacion);
+    mensaje += "c" + String(orientacion) + ",";
+    mensaje += "m" + String(millis());
 
     sendMessage(mensaje);
 
