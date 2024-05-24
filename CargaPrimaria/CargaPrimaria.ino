@@ -24,6 +24,7 @@ double latitudCargaPrimaria, longitudCargaPrimaria;
 double latitudCargaSecundaria, longitudCargaSecundaria;
 double distanciaEntreCargas;
 String orientacion;
+int medicion = 0;
 
 long ultimaVezQueSeEnvioUnMensaje = 0;
 long tiempoEncendido = 0;
@@ -111,6 +112,7 @@ void loop() {
       }
     }
 
+    mensaje += "b" + String(medicion++) + ",";
     mensaje += "t" + String(temperatura, 1) + ",";
     mensaje += "p" + String(presion, 1) + ",";
     mensaje += "a" + String(altura, 1) + ",";

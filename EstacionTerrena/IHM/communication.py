@@ -47,10 +47,22 @@ class Communication:
             if self.ser.in_waiting > 0:
                 datos_obtenidos = self.ser.readline().decode('utf-8', errors='ignore').rstrip()
                 datos = datos_obtenidos.split(',')
-                temperatura, presion, altitud, aceleracion_x, aceleracion_y, aceleracion_z, gyro_x, gyro_y, gyro_z, latitud_carga_primaria, longitud_carga_primaria, latitud_carga_secundaria, longitud_carga_secundaria, distancia, cardinal,  tiempo = [None] * 16
+
+                medicion, 
+                temperatura, 
+                presion, 
+                altitud, 
+                aceleracion_x, aceleracion_y, aceleracion_z, 
+                gyro_x, gyro_y, gyro_z, 
+                latitud_carga_primaria, longitud_carga_primaria, 
+                latitud_carga_secundaria, longitud_carga_secundaria, 
+                distancia, cardinal, 
+                tiempo = [None] * 17
 
                 for dato in datos:
-                    if dato.startswith('t'):
+                    if dato.startswith('b'):
+                        medicion = int(dato.replace('b', ''))
+                    elif dato.startswith('t'):
                         temperatura = float(dato.replace('t', ''))
                     elif dato.startswith('p'):
                         presion = float(dato.replace('p', ''))
@@ -84,6 +96,7 @@ class Communication:
                         tiempo = float(dato.replace('m', ''))
 
                 datos_separados = {
+                    'medicion': medicion,
                     'temperatura': temperatura,
                     'presion': presion,
                     'altitud': altitud,

@@ -196,9 +196,32 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.grafica_giroscopio.update(datos['gyro_x'], datos['gyro_y'], datos['gyro_z'])
                 self.grafica_distancia.update(datos['latitud_carga_primaria'], datos['longitud_carga_primaria'], datos['latitud_carga_secundaria'], datos['longitud_carga_secundaria'], datos['distancia'], datos['cardinal'])
                 self.time.update(datos['tiempo'])
+                
+                lista_datos = [
+                    datos['medicion'],
+                    datos['tiempo'],
+                    datos['temperatura'],
+                    datos['presion'],
+                    datos['altitud'],
+                    datos['aceleracion_x'],
+                    datos['aceleracion_y'],
+                    datos['aceleracion_z'],
+                    datos['gyro_x'],
+                    datos['gyro_y'],
+                    datos['gyro_z'],
+                    datos['latitud_carga_primaria'],
+                    datos['longitud_carga_primaria'],
+                    datos['latitud_carga_secundaria'],
+                    datos['longitud_carga_secundaria'],
+                    datos['distancia'],
+                    datos['cardinal'],
+                ]
 
+                # Cambiar ruta del archivo aqui!!!
+                # Ejemplo: archivo = open(f'C:/Users/carlo/Documents/python/MisionJinne/datos_{archivo_nombre}.csv', 'a')
+                # Lo ideal es que el archivo apunte hacia la carpeta MisionJinne pero puede ser cualquier otra parte
                 archivo = open(f'datos_{archivo_nombre}.csv', 'a')
-                archivo.write(f"{datos}\n")
+                archivo.write(f"{str(lista_datos).replace(' ', '').replace('[', '').replace(']', '')}\n")
 
         except Exception as e:
             pass
